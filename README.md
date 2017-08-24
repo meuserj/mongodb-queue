@@ -295,6 +295,17 @@ Message will have the following structure:
 }
 ```
 
+### .peek() ###
+
+Retrieve the next message from the queue without changing the queue.
+
+```js
+queue.peek(function(err, msg) {
+    // IMPORTANT: The callback will not wait for an message if the queue is empty.  The message will be undefined if the queue is empty.
+})
+```
+Message will have the same structure as returned in the `get` method callback.
+
 ### .ack() ###
 
 After you have received an item from a queue and processed it, you can delete it

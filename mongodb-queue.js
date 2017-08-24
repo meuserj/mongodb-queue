@@ -156,6 +156,25 @@ Queue.prototype.get = function(opts, callback) {
     })
 }
 
+Queue.prototype.peek = function(callback) {
+    var self = this;
+    var query = {
+        deleted : null,
+        visible : { $lte : now() },
+    }
+    var sort = {
+        _id : 1
+    }
+
+    self.col.findOne(query, { sort: sort, returnOriginal : false }, function(err, msg) {
+        if (err) return callback(err)
+        if (!msg) return callback()
+        msg.id = ''+msg._id
+        delete msg._id;
+        callback(null, msg)
+    })
+}
+
 Queue.prototype.ping = function(ack, opts, callback) {
     var self = this
     if ( !callback ) {
