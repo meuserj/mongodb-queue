@@ -94,7 +94,7 @@ Queue.prototype.add = function(payload, opts, callback) {
     self.col.insertMany(msgs, function(err, results) {
         if (err) return callback(err)
         if (payload instanceof Array) return callback(null, '' + results.insertedIds)
-        callback(null, '' + results.ops[0]._id)
+        callback(null, '' + results.insertedIds[0]._id)
     })
 }
 
@@ -121,7 +121,7 @@ Queue.prototype.get = function(opts, callback) {
         }
     }
 
-    self.col.findOneAndUpdate(query, update, { sort: sort, returnOriginal : false }, function(err, result) {
+    self.col.findOneAndUpdate(query, update, { sort: sort, returnOriginal : false , returnDocument: "after" }, function(err, result) {
         if (err) return callback(err)
         var msg = result.value
         if (!msg) return callback()
@@ -167,7 +167,7 @@ Queue.prototype.peek = function(callback) {
         _id : 1
     }
 
-    self.col.findOne(query, { sort: sort, returnOriginal : false }, function(err, msg) {
+    self.col.findOne(query, { sort: sort, returnOriginal : false , returnDocument: "after" }, function(err, msg) {
         if (err) return callback(err)
         if (!msg) return callback()
         msg.id = ''+msg._id
@@ -194,7 +194,7 @@ Queue.prototype.ping = function(ack, opts, callback) {
             visible : nowPlusSecs(visibility)
         }
     }
-    self.col.findOneAndUpdate(query, update, { returnOriginal : false }, function(err, msg, blah) {
+    self.col.findOneAndUpdate(query, update, { returnOriginal : false , returnDocument: "after" }, function(err, msg) {
         if (err) return callback(err)
         if ( !msg.value ) {
             return callback(new Error("Queue.ping(): Unidentified ack  : " + ack))
@@ -216,7 +216,7 @@ Queue.prototype.ack = function(ack, callback) {
             deleted : now(),
         }
     }
-    self.col.findOneAndUpdate(query, update, { returnOriginal : false }, function(err, msg, blah) {
+    self.col.findOneAndUpdate(query, update, { returnOriginal : false , returnDocument: "after" }, function(err, msg) {
         if (err) return callback(err)
         if ( !msg.value ) {
             return callback(new Error("Queue.ack(): Unidentified ack : " + ack))
