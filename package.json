@@ -6,7 +6,10 @@
   "scripts": {
     "test": "set -e; for FILE in test/*.js; do echo --- $FILE ---; node $FILE; done"
   },
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "semver": "^7.5.4"
+  },
   "devDependencies": {
     "async": "^2.6.2",
     "mongodb": "^4.0.0",
