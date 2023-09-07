@@ -156,7 +156,7 @@ Queue.prototype.get = function(opts, callback) {
     }
 
     var wrapper = (result) => {
-        var msg = result.value
+        var msg = (!_.isUndefined(_.get(result, 'value'))) ? _.get(result, 'value') : result;
         if (!msg) return callback()
 
         // convert to an external representation
@@ -257,11 +257,12 @@ Queue.prototype.ping = function(ack, opts, callback) {
             visible : nowPlusSecs(visibility)
         }
     }
-    var wrapper = (msg) => {
-        if ( !msg.value ) {
+    var wrapper = (result) => {
+        var msg = (!_.isUndefined(_.get(result, 'value'))) ? _.get(result, 'value') : result;
+        if ( !msg ) {
             return callback(new Error("Queue.ping(): Unidentified ack  : " + ack))
         }
-        callback(null, '' + msg.value._id)
+        callback(null, '' + msg._id)
     };
     if(self.usePromises) {
         self.col.findOneAndUpdate(query, update, { returnDocument : 'after' }).then(wrapper).catch((err) => {
@@ -293,11 +294,12 @@ Queue.prototype.ack = function(ack, callback) {
             deleted : now(),
         }
     }
-    var wrapper = (msg) => {
-        if ( !msg.value ) {
+    var wrapper = (result) => {
+        var msg = (!_.isUndefined(_.get(result, 'value'))) ? _.get(result, 'value') : result;
+        if ( !msg ) {
             return callback(new Error("Queue.ack(): Unidentified ack : " + ack))
         }
-        callback(null, '' + msg.value._id)
+        callback(null, '' + msg._id)
     };
     if(self.usePromises) {
         self.col.findOneAndUpdate(query, update, { returnDocument : 'after' }).then(wrapper).catch((err) => {
